@@ -1,37 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-function App() {
+const TodoApp = () => {
+  const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState('');
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingText, setEditingText] = useState("");
 
   const handleAddTask = () => {
-    if (newTask.trim() === '') return; // Prevent adding empty tasks
-    setTasks([...tasks, newTask]);
-    setNewTask('');
+    if (task.trim()) {
+      setTasks([...tasks, task]);
+      setTask("");
+    }
+  };
+
+  const handleDeleteTask = (index) => {
+    setTasks(tasks.filter((_, i) => i !== index));
+  };
+
+  const handleEditTask = (index) => {
+    setEditingIndex(index);
+    setEditingText(tasks[index]);
+  };
+
+  const handleUpdateTask = () => {
+    if (editingText.trim()) {
+      const updatedTasks = tasks.map((t, i) => (i === editingIndex ? editingText : t));
+      setTasks(updatedTasks);
+      setEditingIndex(null);
+      setEditingText("");
+    }
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>To-Do List</h1>
+    <div>
+      <h2>Todo List</h2>
       <input
         type="text"
-        value={newTask}
-        onChange={(e) => setNewTask(e.target.value)}
-        placeholder="Add a new task"
-        style={{ padding: '10px', marginRight: '10px' }}
+        placeholder="Enter a task"
+        value={task}
+        onChange={(e) => setTask(e.target.value)}
       />
-      <button onClick={handleAddTask} style={{ padding: '10px', cursor: 'pointer' }}>
-        Add Task
-      </button>
-      <ul style={{ listStyle: 'none', padding: '0', marginTop: '20px' }}>
+      <button onClick={handleAddTask}>Add Task</button>
+
+      <ul>
         {tasks.map((task, index) => (
-          <li key={index} style={{ background: '#f3f3f3', padding: '10px', margin: '5px 0' }}>
-            {task}
+          <li key={index}>
+            {editingIndex === index ? (
+              <>
+                <input
+                  type="text"
+                  value={editingText}
+                  onChange={(e) => setEditingText(e.target.value)}
+                />
+                <button onClick={handleUpdateTask}>Update</button>
+              </>
+            ) : (
+              <>
+                {task}
+                <button onClick={() => handleEditTask(index)}>Edit</button>
+                <button onClick={() => handleDeleteTask(index)}>Delete</button>
+              </>
+            )}
           </li>
         ))}
       </ul>
     </div>
   );
-}
+};
 
-export default App;
+export default TodoApp;
